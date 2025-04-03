@@ -1,38 +1,29 @@
 @echo off
-echo Starting Question Collection System...
+setlocal enabledelayedexpansion
 
-REM Get local IP address for LAN access
-for /f "tokens=2 delims=:" %%a in ('ipconfig ^| findstr /r /c:"IPv4 Address"') do (
-    set IP_ADDRESS=%%a
-)
-set IP_ADDRESS=%IP_ADDRESS:~1%
-echo Local IP address: %IP_ADDRESS%
+echo ==============================================
+echo Question Collection System - Startup Script
+echo ==============================================
 
-REM Start the backend server
-echo Starting backend server...
-start cmd /k "cd backend && mvn spring-boot:run"
+REM Start the frontend
+cd /d "%~dp0frontend"
+echo Starting frontend service...
+start cmd /c "npm run dev -- --host 0.0.0.0 --port 5174"
 
-echo Waiting for backend to initialize...
-timeout /t 10 /nobreak
-
-REM Start the frontend server
-echo Starting frontend server...
-start cmd /k "cd frontend && npm install && npm run dev"
+REM Start the backend
+cd /d "%~dp0backend"
+echo Starting backend service...
+start cmd /c "mvn spring-boot:run"
 
 echo.
-echo =====================================================
+echo ==============================================
 echo System is now running!
 echo.
-echo Local access:
-echo - Frontend: http://localhost:5173
-echo - Backend API: http://localhost:8080/api
+echo Frontend URL: http://localhost:5174
+echo Backend API: http://localhost:8080/api
 echo.
-echo LAN access:
-echo - Frontend: http://%IP_ADDRESS%:5173
-echo - Backend API: http://%IP_ADDRESS%:8080/api
-echo =====================================================
-echo.
-echo Note: If this is your first time, run setup-firewall.bat as administrator
-echo to configure Windows Firewall for network access.
+echo Please keep command windows open to keep services running
+echo ==============================================
 
-pause 
+echo Press any key to exit this window (services will continue in background)...
+pause > nul 
